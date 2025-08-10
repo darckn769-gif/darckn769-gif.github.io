@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>GameZone, realm of mod</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="icon" href="https://i.imgur.com/fE6l1m2.png" type="image/png">
+
+<style>
+    :root {
+        /* -- Base Theme -- */
+        --color-bg: #e9edf5;
+        --color-surface: rgba(255, 255, 255, 0.75);
+        --color-nav-bg: rgba(255, 255, 255, 0.65);
+        --color-search-bg: #eef2f9;
+        --color-text-primary: #1a202c;
+        --color-text-secondary: #5A677B; 
+        --color-border: #e2e8f0;
+        
+        /* -- Vivid Colors & Gradient -- */
+        --gradient-accent: linear-gradient(135deg, #3672F8, #A336F8);
+        --color-accent-primary: #3672F8;
+        --color-accent-primary-darker: #2f61d1;
+        --color-shadow: rgba(45, 55, 72, 0.1);
+        --color-shadow-focus: rgba(54, 114, 248, 0.4);
+        
+        /* -- Fonts -- */
+        --font-primary: 'Inter', sans-serif;
+        --font-title: 'Orbitron', sans-serif;
+        --spacing-unit: 8px;
+        --border-radius: 12px;
+        --transition-speed: 0.3s;
+        --transition-speed-fast: 0.2s;
+    }
+
+    [data-theme="dark"] {
+        --color-bg: #0A0C12;
+        --color-surface: rgba(30, 33, 41, 0.7);
+        --color-nav-bg: rgba(30, 33, 41, 0.6);
+        --color-search-bg: #2d3748;
+        --color-text-primary: #edf2f7;
+        --color-text-secondary: #94a3b8;
+        --color-border: #4a5568;
+        --color-shadow: rgba(0, 0, 0, 0.25);
+        --color-shadow-focus: rgba(54, 114, 248, 0.3); 
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        font-family: var(--font-primary);
+        background-color: var(--color-bg);
+        color: var(--color-text-primary);
+        line-height: 1.6;
+        transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+    }
+
+    /* DYNAMIC AURORA BACKGROUND */
+    .background-aurora {
+        position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+        z-index: -1; overflow: hidden;
+    }
+    .aurora-shape {
+        position: absolute; border-radius: 50%;
+        filter: blur(120px); will-change: transform;
+    }
+    .shape1 {
+        width: 500px; height: 500px; top: -150px; left: -150px;
+        background-color: var(--color-accent-primary);
+        opacity: 0.3; animation: drift 25s infinite alternate ease-in-out;
+    }
+    .shape2 {
+        width: 450px; height: 450px; bottom: -200px; right: -100px;
+        background-color: #A336F8; opacity: 0.4;
+        animation: drift 30s infinite alternate-reverse ease-in-out;
+    }
+    [data-theme="light"] .aurora-shape { opacity: 0.15; }
+    [data-theme="light"] .shape2 { opacity: 0.1; }
+
+    @keyframes drift {
+        0% { transform: translate(0, 0) rotate(0deg) scale(1); }
+        100% { transform: translate(100px, 80px) rotate(120deg) scale(1.3); }
+    }
+    /* --- END OF BACKGROUND STYLES --- */
+
+    main {
+        width: 100%; max-width: 1200px;
+        padding-top: calc(var(--spacing-unit) * 10);
+        z-index: 1;
+    }
+    
+    footer { z-index: 1; }
+    
+    /* NAVIGATION */
+    .main-nav {
+        background-color: var(--color-nav-bg);
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+        display: flex; justify-content: space-between; align-items: center;
+        padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 3);
+        position: fixed; top: 0; left: 0; width: 100%;
+        z-index: 1000;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .logo-container { display: flex; align-items: center; gap: calc(var(--spacing-unit) * 1.5); }
+    .logo-icon { font-size: 30px; color: var(--color-text-primary); }
+    .logo-container .logo-text {
+        font-family: var(--font-title);
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+        letter-spacing: 0.5px;
+        transition: color var(--transition-speed) ease;
+    }
+    
+    /* SEARCH BAR & RESULTS */
+    .nav-search-container { flex-grow: 1; margin: 0 calc(var(--spacing-unit) * 4); max-width: 600px; position: relative; }
+    .nav-search-container .search-icon { position: absolute; top: 50%; left: calc(var(--spacing-unit) * 2); transform: translateY(-50%); color: var(--color-text-secondary); z-index: 1; }
+    .nav-search-container input {
+        width: 100%;
+        padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 9) calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 5);
+        font-size: 1rem; border-radius: 50px; border: 1px solid transparent; background-color: var(--color-search-bg);
+        color: var(--color-text-primary); outline: none; transition: all var(--transition-speed) ease;
+    }
+    .nav-search-container input:focus { box-shadow: 0 0 0 3px var(--color-shadow-focus); background-color: var(--color-surface); border-color: var(--color-accent-primary); }
+    .search-clear-btn {
+        position: absolute; top: 50%; right: calc(var(--spacing-unit) * 1.5); transform: translateY(-50%);
+        background: none; border: none; font-size: 1.5rem; color: var(--color-text-secondary); cursor: pointer;
+        padding: var(--spacing-unit); line-height: 0; display: none;
+    }
+    .nav-search-container.search-active .search-clear-btn { display: block; }
+    .search-results-container {
+        opacity: 0; visibility: hidden;
+        transform: translateY(-10px);
+        transition: opacity var(--transition-speed-fast) ease, transform var(--transition-speed-fast) ease, visibility var(--transition-speed-fast);
+        position: absolute; top: calc(100% + 8px); left: 0; width: 100%;
+        background-color: var(--color-surface); border-radius: var(--border-radius);
+        box-shadow: 0 8px 30px var(--color-shadow); border: 1px solid var(--color-border);
+        max-height: 400px; overflow-y: auto; z-index: 1100;
+    }
+    .search-results-container.active { opacity: 1; visibility: visible; transform: translateY(0); }
+    .search-result-item {
+        display: flex; align-items: center; gap: calc(var(--spacing-unit) * 2); padding: calc(var(--spacing-unit) * 1.5);
+        cursor: pointer; border-bottom: 1px solid var(--color-border); text-decoration: none;
+        transition: background-color var(--transition-speed-fast) ease;
+    }
+    .search-result-item:last-child { border-bottom: none; }
+    .search-result-item:hover { background-color: var(--color-search-bg); }
+    .search-result-item img { width: 48px; height: 48px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+    .search-result-info h4 { font-size: 0.95rem; font-weight: 600; margin: 0; color: var(--color-text-primary); }
+    .search-result-info p { font-size: 0.8rem; color: var(--color-text-secondary); margin: 0; }
+    .no-results-message { text-align: center; padding: calc(var(--spacing-unit) * 4); }
+    .no-results-message i { font-size: 1.5rem; margin-bottom: var(--spacing-unit); }
+
+    /* THEME TOGGLE BUTTON - NEW SIMPLE STYLE */
+    .settings-button {
+        background: transparent;
+        border: 1px solid transparent;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all var(--transition-speed-fast) ease;
+        color: var(--color-text-secondary);
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .settings-button:hover, .settings-button:focus {
+        background-color: var(--color-search-bg);
+        color: var(--color-text-primary);
+        outline: none;
+    }
+
+    .settings-button #theme-icon {
+        /* Reset icon styles from the old slider */
+        position: static;
+        transform: none;
+        background-color: transparent;
+        box-shadow: none;
+        font-size: 1.2rem;
+        width: auto;
+        height: auto;
+        transition: transform 0.3s ease;
+    }
+
+    .settings-button:hover #theme-icon {
+        transform: rotate(15deg);
+    }
+    
+    /* FEATURED HEADER */
+    .featured-header {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+        margin: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 2);
+        border-left: 5px solid var(--color-accent-primary);
+        background: linear-gradient(90deg, var(--color-surface) 0%, var(--color-search-bg) 100%);
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    }
+    .featured-header h2 {
+        font-family: var(--font-title);
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+    .view-all-btn {
+        background: none; color: var(--color-accent-primary); text-decoration: none; font-weight: 600;
+        display: flex; align-items: center; gap: var(--spacing-unit); transition: color var(--transition-speed) ease;
+    }
+    .view-all-btn:hover { color: var(--color-accent-primary-darker); }
+    .view-all-btn i { transition: transform var(--transition-speed-fast) ease; }
+    .view-all-btn:hover i { transform: translateX(4px); }
+
+    /* CARDS GRID */
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: calc(var(--spacing-unit) * 3);
+        padding: calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 3);
+    }
+    .grid.grid-centered .card { width: 250px; margin: 0 auto; }
+    
+    .card {
+        position: relative; 
+        background: var(--color-surface);
+        -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+        border: 1px solid var(--color-border);
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 12px var(--color-shadow);
+        text-align: center;
+        padding: calc(var(--spacing-unit) * 2);
+        transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        display: flex; flex-direction: column;
+    }
+    .card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 25px var(--color-shadow), 0 0 15px var(--color-shadow-focus);
+    }
+    .card img {
+        width: 100%; aspect-ratio: 1 / 1; object-fit: cover;
+        border-radius: calc(var(--border-radius) - 4px);
+        margin-bottom: calc(var(--spacing-unit) * 1.5);
+    }
+    
+    .card h3 { 
+        margin: 0; font-family: var(--font-title);
+        font-size: 1.3rem; font-weight: 700;
+        color: var(--color-text-primary);
+        letter-spacing: 0.5px;
+    }
+
+    .card p { font-size: 0.9rem; color: var(--color-text-secondary); margin-block: calc(var(--spacing-unit) * 0.5); }
+    .card .mod-desc { font-size: 0.8rem; height: 3em; line-height: 1.5em; flex-grow: 1; overflow: hidden; margin-bottom: calc(var(--spacing-unit) * 1.5); }
+    
+    .card .downloads, .card .rating {
+        position: absolute; top: calc(var(--spacing-unit) * 1.5);
+        background-color: rgba(0, 0, 0, 0.4); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
+        color: white; padding: calc(var(--spacing-unit) * 0.5) var(--spacing-unit);
+        border-radius: calc(var(--border-radius) / 2); font-size: 0.8rem; font-weight: 500; z-index: 10;
+    }
+    .card .downloads { left: calc(var(--spacing-unit) * 1.5); }
+    .card .rating { right: calc(var(--spacing-unit) * 1.5); }
+    .card .rating .fa-star { color: #ffc107; }
+    .card .downloads i, .card .rating i { margin-right: calc(var(--spacing-unit) * 0.5); }
+
+    .card-actions {
+        display: flex; margin-top: auto; padding-top: calc(var(--spacing-unit) * 1.5);
+    }
+
+    .install-btn {
+        background-image: var(--gradient-accent);
+        color: white; 
+        padding: calc(var(--spacing-unit) * 1.25) calc(var(--spacing-unit) * 2);
+        border: none; border-radius: calc(var(--border-radius) / 1.5);  
+        text-decoration: none;  
+        font-weight: 700;
+        text-transform: uppercase;
+        display: flex; align-items: center; justify-content: center;
+        flex: 1;
+        transition: all var(--transition-speed-fast) ease;
+    }
+    .install-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 15px var(--color-shadow-focus);
+        filter: brightness(1.15);
+    }
+    .install-btn i { margin-right: var(--spacing-unit); }
+
+    footer { text-align: center; padding: calc(var(--spacing-unit) * 3); margin-top: calc(var(--spacing-unit) * 4); background-color: var(--color-surface); color: var(--color-text-secondary); font-size: 0.9rem; border-top: 1px solid var(--color-border); width: 100%;}
+
+    /* RESPONSIVE */
+    @media screen and (max-width: 768px) { .nav-search-container { margin: 0 calc(var(--spacing-unit) * 2); } }
+    @media screen and (max-width: 480px) {
+        .logo-container .logo-text { display: none; }
+        .featured-header h2 { font-size: 1.4rem; }
+        .view-all-btn { font-size: 0.9rem; }
+        .logo-icon { font-size: 28px; }
+    }
+</style>
+</head>
+<body>
+    
+    <div class="background-aurora">
+        <div class="aurora-shape shape1"></div>
+        <div class="aurora-shape shape2"></div>
+    </div>
+
+    <nav class="main-nav" aria-label="Main Navigation">
+        <div class="logo-container">
+            <i class="fas fa-gamepad logo-icon"></i>
+            <span class="logo-text">GameZone</span>
+        </div>
+        <div id="searchContainer" class="nav-search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search games..." autocomplete="off" />
+            <button id="searchClearBtn" class="search-clear-btn">&times;</button>
+            <div id="searchResults" class="search-results-container"></div>
+        </div>
+        <button class="settings-button" id="theme-toggle" aria-label="Toggle theme">
+            <i id="theme-icon"></i>
+        </button>
+    </nav>
+
+    <main id="mainContent">
+        <div class="featured-header">
+            <h2>Featured Games</h2>
+            <a href="#" class="view-all-btn" id="viewAllBtn">
+                View All <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+        <div class="grid" id="appsGrid">
+
+            <!-- MONOPOLY GO! (FIRST CARD - YOUR CONTENT LOCKER LINK) -->
+            <div class="card" data-name="Monopoly GO!" data-category="Board Game" data-image="https://upload.wikimedia.org/wikipedia/en/thumb/e/ed/App_icon_of_Monopoly_Go%21%2C_Scopely%2C_2023.webp/230px-App_icon_of_Monopoly_Go%21%2C_Scopely%2C_2023.webp.png">
+                <span class="downloads"><i class="fas fa-download"></i> 50.7M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.8</span>
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/e/ed/App_icon_of_Monopoly_Go%21%2C_Scopely%2C_2023.webp/230px-App_icon_of_Monopoly_Go%21%2C_Scopely%2C_2023.webp.png" alt="Monopoly GO!">
+                <h3>Monopoly GO!</h3>
+                <p>Board • MOD APK</p>
+                <p class="mod-desc">Unlimited dice rolls & money</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+
+            <!-- ROBLOX -->
+            <div class="card" data-name="Roblox" data-category="Sandbox" data-image="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU3PVRE_vleIyipQnw-7O8KiVVHHFbNTdCQA&s">
+                <span class="downloads"><i class="fas fa-download"></i> 178.5M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.6</span>
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRU3PVRE_vleIyipQnw-7O8KiVVHHFbNTdCQA&s" alt="Roblox">
+                <h3>Roblox</h3>
+                <p>Sandbox • MOD APK</p>
+                <p class="mod-desc">Unlimited Robux, all items unlocked</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+
+            <!-- ROYAL MATCH -->
+            <div class="card" data-name="Royal Match" data-category="Puzzle" data-image="https://i.pinimg.com/474x/d1/dc/4d/d1dc4d447d93000d36f261b745f62b00.jpg">
+                <span class="downloads"><i class="fas fa-download"></i> 45.2M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.8</span>
+                <img src="https://i.pinimg.com/474x/d1/dc/4d/d1dc4d447d93000d36f261b745f62b00.jpg" alt="Royal Match">
+                <h3>Royal Match</h3>
+                <p>Puzzle • MOD APK</p>
+                <p class="mod-desc">Unlimited lives & boosters</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+
+            <!-- CALL OF DUTY MOBILE -->
+            <div class="card" data-name="Call of Duty Mobile" data-category="FPS" data-image="https://w0.peakpx.com/wallpaper/575/529/HD-wallpaper-call-of-duty-mobile-call-of-duty-call-of-duty-warzone-cod-cod-mobile-gamer-pubg-mobile-warzone.jpg">
+                <span class="downloads"><i class="fas fa-download"></i> 120.3M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.7</span>
+                <img src="https://w0.peakpx.com/wallpaper/575/529/HD-wallpaper-call-of-duty-mobile-call-of-duty-call-of-duty-warzone-cod-cod-mobile-gamer-pubg-mobile-warzone.jpg" alt="Call of Duty Mobile">
+                <h3>COD Mobile</h3>
+                <p>FPS • MOD APK</p>
+                <p class="mod-desc">Aimbot, wallhack, unlimited CP</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+
+            <!-- HONKAI STAR RAIL -->
+            <div class="card" data-name="Honkai Star Rail" data-category="RPG" data-image="https://i.pinimg.com/474x/2b/44/75/2b44759b9ff21775f76870e5937bf62d.jpg">
+                <span class="downloads"><i class="fas fa-download"></i> 25.8M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.9</span>
+                <img src="https://i.pinimg.com/474x/2b/44/75/2b44759b9ff21775f76870e5937bf62d.jpg" alt="Honkai Star Rail">
+                <h3>Honkai Star Rail</h3>
+                <p>RPG • MOD APK</p>
+                <p class="mod-desc">Unlimited Stellar Jade & resources</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+
+            <!-- CLASH OF CLANS -->
+            <div class="card" data-name="Clash of Clans" data-category="Strategy" data-image="https://i.redd.it/79k42sxu3faf1.jpeg">
+                <span class="downloads"><i class="fas fa-download"></i> 210.5M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.7</span>
+                <img src="https://i.redd.it/79k42sxu3faf1.jpeg" alt="Clash of Clans">
+                <h3>Clash of Clans</h3>
+                <p>Strategy • MOD APK</p>
+                <p class="mod-desc">Unlimited gems & resources</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+
+            <!-- RAID SHADOW LEGENDS -->
+            <div class="card" data-name="Raid Shadow Legends" data-category="RPG" data-image="https://sm.ign.com/ign_nordic/cover/r/raid-shado/raid-shadow-legends_abst.jpg">
+                <span class="downloads"><i class="fas fa-download"></i> 65.3M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.6</span>
+                <img src="https://sm.ign.com/ign_nordic/cover/r/raid-shado/raid-shadow-legends_abst.jpg" alt="Raid Shadow Legends">
+                <h3>Raid Shadow Legends</h3>
+                <p>RPG • MOD APK</p>
+                <p class="mod-desc">Unlimited gems & energy</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+
+            <!-- HOMESCAPES -->
+            <div class="card" data-name="Homescapes" data-category="Puzzle" data-image="https://upload.wikimedia.org/wikipedia/en/7/7e/Homescapes_icon.png">
+                <span class="downloads"><i class="fas fa-download"></i> 85.7M</span>
+                <span class="rating"><i class="fas fa-star"></i> 4.7</span>
+                <img src="https://upload.wikimedia.org/wikipedia/en/7/7e/Homescapes_icon.png" alt="Homescapes">
+                <h3>Homescapes</h3>
+                <p>Puzzle • MOD APK</p>
+                <p class="mod-desc">Unlimited stars & coins</p>
+                <div class="card-actions">
+                    <a href="https://appinstallcheck.com/cl/i/2lvjmp" class="install-btn"><i class="fas fa-download"></i> Download</a>
+                </div>
+            </div>
+ 
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2025 GameZone. All rights reserved.
+    </footer>
+
+    <script>
+        // Scripts remain the same as they are fully functional.
+        const themeToggleButton = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const updateThemeIcon = (theme) => {
+            const isDark = theme === 'dark';
+            themeIcon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+        };
+        const setTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateThemeIcon(theme);
+        };
+        themeToggleButton.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            setTheme(current === 'dark' ? 'light' : 'dark');
+        });
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+        const searchContainer = document.getElementById("searchContainer");
+        const searchInput = document.getElementById("searchInput");
+        const searchClearBtn = document.getElementById("searchClearBtn");
+        const searchResultsContainer = document.getElementById("searchResults");
+        const allGameCards = document.querySelectorAll(".card");
+        const appsGrid = document.getElementById('appsGrid');
+        let gameData = [];
+        allGameCards.forEach(card => {
+            gameData.push({
+                name: card.dataset.name,
+                category: card.dataset.category,
+                image: card.querySelector('img').src,
+                url: card.querySelector('.install-btn').href, 
+            });
+        });
+        searchInput.addEventListener("input", (e) => {
+            const query = e.target.value.toLowerCase();
+            if (query.length > 0) {
+                searchContainer.classList.add('search-active');
+                searchResultsContainer.classList.add('active');
+                const filteredGames = gameData.filter(game => game.name.toLowerCase().includes(query));
+                displaySearchResults(filteredGames);
+            } else {
+                searchContainer.classList.remove('search-active');
+                hideSearchResults(); 
+            }
+        });
+        function displaySearchResults(results) {
+            if (results.length === 0) {
+                searchResultsContainer.innerHTML = `<div class="no-results-message"><i class="fas fa-frown"></i><p>No games found.</p></div>`;
+                return;
+            }
+            searchResultsContainer.innerHTML = results.map(game => `
+                <div class="search-result-item" data-name="${game.name}" style="cursor: pointer;">
+                    <img src="${game.image}" alt="${game.name}">
+                    <div class="search-result-info"><h4>${game.name}</h4><p>${game.category}</p></div>
+                </div>`).join('');
+        }
+        function hideSearchResults() { searchResultsContainer.classList.remove('active'); }
+        searchClearBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchContainer.classList.remove('search-active');
+            hideSearchResults();
+        });
+        searchInput.addEventListener('focus', () => {
+             if (searchInput.value.length > 0) { searchResultsContainer.classList.add('active'); }
+        });
+        document.addEventListener('click', function(event) {
+            if (!searchContainer.contains(event.target)) { hideSearchResults(); }
+        });
+        const viewAllBtn = document.getElementById('viewAllBtn');
+        function showSelectedGame(gameName) {
+            allGameCards.forEach(card => {
+                if (card.dataset.name === gameName) { card.style.display = 'flex'; } 
+                else { card.style.display = 'none'; }
+            });
+            appsGrid.classList.add('grid-centered');
+        }
+        function showAllGames() {
+            allGameCards.forEach(card => { card.style.display = 'flex'; });
+            appsGrid.classList.remove('grid-centered');
+        }
+        searchResultsContainer.addEventListener('click', (e) => {
+            const resultItem = e.target.closest('.search-result-item');
+            if (resultItem) {
+                const gameName = resultItem.dataset.name;
+                showSelectedGame(gameName);
+                searchInput.value = '';
+                hideSearchResults();
+                searchContainer.classList.remove('search-active');
+            }
+        });
+        viewAllBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            showAllGames();
+        });
+    </script>
+    <script>
+    document.querySelectorAll('.card').forEach(card => {
+        const imgEl = card.querySelector('img');
+        const imgUrl = card.dataset.image;
+        if (imgUrl) {
+            imgEl.src = imgUrl;
+        }
+    });
+    </script>
+    <script type="text/javascript">var ogblock=true;</script>
+
+</body>
+</html>
